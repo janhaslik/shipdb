@@ -14,11 +14,9 @@ Deadline: 21.5.2023
 
 ## Beurteilung: 
   + Datenbank vorhanden (~10%)
-  + Komplexität der Beispiele (Schwiergikeit der Abfragen, Control Statements, Cursor, …)
-  + einfache Use-Cases (~20%)
-  + komplexere Use-Cases (~40%)
-  + Layers (~10*)
+  + Use-Cases (Einfach ~20%, Komplex ~40%) (Schwiergikeit der Abfragen, Control Statements, Cursor, …)
+  + Layers (~10%)
   + Logging (~10%)
   + Tests (~20%)
-  + Saubere Dokumentation (~10%)
-  + Präsentation (+10%)
+  + Dokumentation (~10%)
+  + Präsentation (Bonus 10%)
