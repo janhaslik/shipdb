@@ -302,7 +302,7 @@ BEGIN
     RETURN 'User added successfully';
 EXCEPTION
     WHEN DUP_VAL_ON_INDEX THEN
-        RETURN 'User with the same ID already exists';
+        RETURN 'User with the same NR already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding user';
 END add_user;
@@ -333,7 +333,7 @@ BEGIN
     RETURN 'Ship added successfully';
 EXCEPTION
     WHEN DUP_VAL_ON_INDEX THEN
-        RETURN 'Ship with the same ID already exists';
+        RETURN 'Ship with the same NR already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding ship';
 END add_ship;
