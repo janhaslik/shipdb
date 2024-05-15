@@ -7,16 +7,16 @@ PL/SQL Project 2024
 Deadline: 21.5.2023
 
 ## Anforderungen:
-  + ☑ Mindestens 10 Tabellen
+  + ☑ Mindestens 10 Tabellen => (13 / 10)
   + ☐ Mindestens 12 Sinvolle UseCases
-  + ☐ Layered Architecture
+  + ☐ 2 Layer Architecture (Body + HelperFunctions)
   + ☐ Exception Handling (Keine Businesslogik im Block)
   + ☐ Logging (Tabelle)
   + ☐ Trigger (Falls Sinnvoll) 
   + ☐ Tests (TestPackage)
 
 ## Beurteilung: 
-  + ☐ Use-Cases (Einfach 20%, Komplex 40%) (Schwiergikeit der Abfragen, Control Statements, Cursor, …)
+  + ☐ Use-Cases (20% - 40%, nach Komplexität) (Schwiergikeit der Abfragen, Control Statements, Cursor, …)
   + ☐ Layers (10%)
   + ☐ Logging (10%)
   + ☐ Tests (20%)
