@@ -1,25 +1,29 @@
 -- Create database (PL/SQL does not directly create databases like MySQL)
 -- Assuming you're already connected to the correct schema/user in Oracle.
+
 /*
+-- Drop Tables with Foreign Keys
 DROP TABLE planes_maintenances;
 DROP TABLE planes_shipments;
 DROP TABLE planes_crewmembers;
-DROP TABLE planes;
 
--- Drop ships related tables
 DROP TABLE ships_shipments;
 DROP TABLE ships_maintenances;
 DROP TABLE ships_crewmembers;
-DROP TABLE ships;
 
--- Drop general tables
+DROP TABLE users;
+
+-- Drop Tables without Foreign Keys
 DROP TABLE maintenances;
 DROP TABLE shipments;
 DROP TABLE crewmembers;
 
--- Drop owner related tables
-DROP TABLE users;
-DROP TABLE owners;*/
+DROP TABLE planes;
+DROP TABLE ships;
+
+DROP TABLE owners;
+*/
+
 -- Create owners table
 CREATE TABLE owners
 (
@@ -77,17 +81,19 @@ CREATE TABLE ships_crewmembers
     ship       NUMBER,
     crewmember NUMBER,
     CONSTRAINT ships_crewmembers_fk_ship FOREIGN KEY (ship) REFERENCES ships (shipnr),
-    CONSTRAINT ships_crewmembers_fk_crewmember FOREIGN KEY (crewmember) REFERENCES crewmembers (crewmemberid)
+    CONSTRAINT ships_crewmembers_fk_crewmember FOREIGN KEY (crewmember) REFERENCES crewmembers (crewmemberid),
+    CONSTRAINT ships_crewmembers_unique_ship_crewmember UNIQUE (ship, crewmember)
 );
 
 -- Create planes_crewmembers table
 CREATE TABLE planes_crewmembers
 (
     id         NUMBER PRIMARY KEY,
-    planenr    NUMBER,
+    plane    NUMBER,
     crewmember NUMBER,
-    CONSTRAINT planes_crewmembers_fk_planenr FOREIGN KEY (planenr) REFERENCES planes (planenr),
-    CONSTRAINT planes_crewmembers_fk_crewmember FOREIGN KEY (crewmember) REFERENCES crewmembers (crewmemberid)
+    CONSTRAINT planes_crewmembers_fk_planenr FOREIGN KEY (plane) REFERENCES planes (planenr),
+    CONSTRAINT planes_crewmembers_fk_crewmember FOREIGN KEY (crewmember) REFERENCES crewmembers (crewmemberid),
+    CONSTRAINT planes_crewmembers_unique_plane_crewmember UNIQUE (plane, crewmember)
 );
 
 -- Create shipments table
@@ -254,3 +260,5 @@ INSERT INTO ships_maintenances (id, ship, maintenance)
 VALUES (3, 900, 3);
 INSERT INTO ships_maintenances (id, ship, maintenance)
 VALUES (4, 902, 4);
+
+select * from owners;
