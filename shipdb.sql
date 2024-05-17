@@ -52,7 +52,8 @@ CREATE TABLE ships
     type         VARCHAR2(20) CHECK (type IN ('Passenger', 'Cargo')),
     image        VARCHAR2(64),
     currentvalue VARCHAR2(64),
-    year         DATE
+    year         DATE,
+    foreign key (owner) references owners(ownerid)
 );
 
 -- Create planes table
@@ -63,7 +64,8 @@ CREATE TABLE planes
     type         VARCHAR2(20) CHECK (type IN ('Passenger', 'Cargo')),
     image        VARCHAR2(64),
     currentvalue VARCHAR2(64),
-    year         DATE
+    year         DATE,
+    foreign key (owner) references owners(ownerid)
 );
 
 -- Create crewmembers table
