@@ -21,7 +21,6 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding owner';
 END add_owner;
-
 -- Add a user
 /* Jan Haslik */
 CREATE OR REPLACE FUNCTION add_user(
@@ -50,7 +49,6 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding user';
 END add_user;
-
 -- Add a ship
 /* Jan Haslik */
 CREATE OR REPLACE FUNCTION add_ship(
@@ -83,7 +81,6 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding ship';
 END add_ship;
-
 -- Add a plane
 /* Daniel Kunesch */
 CREATE OR REPLACE FUNCTION add_plane(
@@ -114,7 +111,6 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Plane';
 END add_plane;
-
 -- Add a crewmember
 /* Daniel Kunesch */
 CREATE OR REPLACE FUNCTION add_crewmember(
@@ -135,7 +131,6 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Crewmember';
 END add_crewmember;
-
 -- Add a crewmember to a ship
 /* Daniel Kunesch */
 CREATE OR REPLACE FUNCTION add_ship_crewmember(
@@ -169,7 +164,6 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Ships_Crewmember';
 END add_ship_crewmember;
-
 -- Add a crewmember to a plane
 /* Daniel Kunesch */
 CREATE OR REPLACE FUNCTION add_plane_crewmember(
@@ -203,7 +197,6 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Plane_Crewmember';
 END add_plane_crewmember;
-
 -- Add a shipment
 /* Daniel Kunesch*/
 CREATE OR REPLACE FUNCTION add_shipment(
@@ -226,7 +219,6 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Shipment';
 END add_shipment;
-
 -- Add a shipment to a ship
 /* Daniel Kunesch */
 CREATE OR REPLACE FUNCTION add_ship_shipment(
@@ -260,7 +252,6 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Ships_Shipment';
 END add_ship_shipment;
-
 -- Add a shipment to a plane
 /* Daniel Kunesch */
 CREATE OR REPLACE FUNCTION add_plane_shipment(
@@ -282,7 +273,7 @@ BEGIN
         RETURN 'Shipment not found';
     END IF;
 
-    INSERT INTO ships_shipments (id, ship, shipment)
+    INSERT INTO planes_shipments (id, planenr, shipmentid)
     VALUES (v_id_param, v_plane_param, v_shipment_param);
 
     COMMIT;
@@ -294,15 +285,93 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Planes_Shipment';
 END add_plane_shipment;
-
 -- Add a maintenance
-/**/
+/* Daniel Kunesch */
+CREATE OR REPLACE FUNCTION add_maintenance(
+    v_maintenanceid_param IN NUMBER,
+    v_maintenanceDate_param IN DATE,
+    v_type_param IN VARCHAR2,
+    v_maintenanceDescription_param IN VARCHAR2
+) RETURN VARCHAR2 IS
+BEGIN
+    INSERT INTO maintenances (maintenanceid, maintenancedate, type, maintenancedescription)
+    VALUES (v_maintenanceid_param, v_maintenanceDate_param, v_type_param, v_maintenanceDescription_param);
 
+    COMMIT;
+
+    RETURN 'Maintenance added successfully';
+EXCEPTION
+    WHEN DUP_VAL_ON_INDEX THEN
+        RETURN 'Maintenance with the same ID already exists';
+    WHEN OTHERS THEN
+        RETURN 'Error adding Maintenance';
+END add_maintenance;
 -- Schedule a Maintenance for a Ship
-/**/
+/* Daniel Kunesch */
+CREATE OR REPLACE FUNCTION add_ship_maintenance(
+    v_id_param IN NUMBER,
+    v_ship_param IN NUMBER,
+    v_maintenance_param IN NUMBER
+) RETURN VARCHAR2 IS
+    ship_count    NUMBER;
+    maintenance_count NUMBER;
+BEGIN
+    -- Check if the owner exists
+    SELECT COUNT(*) INTO ship_count FROM ships WHERE shipnr = v_ship_param;
+    IF ship_count = 0 THEN
+        RETURN 'Ship not found';
+    END IF;
 
+    SELECT COUNT(*) INTO maintenance_count FROM maintenances WHERE maintenanceid = v_maintenance_param;
+    IF maintenance_count = 0 THEN
+        RETURN 'Maintenance not found';
+    END IF;
+
+    INSERT INTO SHIPS_MAINTENANCES (id, ship, maintenance)
+    VALUES (v_id_param, v_ship_param, v_maintenance_param);
+
+    COMMIT;
+
+    RETURN 'Ships_Maintenance added successfully';
+EXCEPTION
+    WHEN DUP_VAL_ON_INDEX THEN
+        RETURN 'Ships_Maintenance with the same id or combination already exists';
+    WHEN OTHERS THEN
+        RETURN 'Error adding Ships_Maintenance';
+END add_ship_maintenance;
 -- Schedule a Maintenance for a Plane
-/**/
+/* Daniel Kunesch*/
+CREATE OR REPLACE FUNCTION add_plane_maintenance(
+    v_id_param IN NUMBER,
+    v_planenr_param IN NUMBER,
+    v_maintenanceid_param IN NUMBER
+) RETURN VARCHAR2 IS
+    plane_count    NUMBER;
+    maintenance_count NUMBER;
+BEGIN
+    -- Check if the owner exists
+    SELECT COUNT(*) INTO plane_count FROM planes WHERE planenr = v_planenr_param;
+    IF plane_count = 0 THEN
+        RETURN 'Plane not found';
+    END IF;
+
+    SELECT COUNT(*) INTO maintenance_count FROM maintenances WHERE maintenanceid = v_maintenanceid_param;
+    IF maintenance_count = 0 THEN
+        RETURN 'Maintenance not found';
+    END IF;
+
+    INSERT INTO PLANES_MAINTENANCES (id, planenr, maintenanceid)
+    VALUES (v_id_param, v_planenr_param, v_maintenanceid_param);
+
+    COMMIT;
+
+    RETURN 'Planes_Maintenance added successfully';
+EXCEPTION
+    WHEN DUP_VAL_ON_INDEX THEN
+        RETURN 'Planes_Maintenance with the same id or combination already exists';
+    WHEN OTHERS THEN
+        RETURN 'Error adding Planes_Maintenance';
+END add_plane_maintenance;
 
 -- Trigger to prevent Insertion between 23:00 and 05:00
 /* Jan Haslik */
@@ -326,7 +395,6 @@ begin
         raise_application_error(-20001, 'not allowed between 5 and 23');
     end if;
 end;
-
 -- Complex Procedure Generate_Owner_Plane_Fleet_Report
 /* Jan Haslik */
 CREATE OR REPLACE PROCEDURE Generate_Owner_Plane_Fleet_Report(p_ownerid IN NUMBER) IS
@@ -413,7 +481,6 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('No fleet found for owner with ID: ' || p_ownerid);
     END IF;
 END;
-
 -- Complex Procedure Generate_Owner_Ship_Fleet_Report
 /* Jan Haslik */
 CREATE OR REPLACE PROCEDURE Generate_Owner_Ship_Fleet_Report(p_ownerid IN NUMBER) IS
@@ -501,7 +568,6 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('No fleet found for owner with ID: ' || p_ownerid);
     END IF;
 END;
-
 -- Complex Procedure Identify_Unassigned_Crew_Members
 /* Jan Haslik*/
 CREATE OR REPLACE PROCEDURE Identify_Unassigned_Crew_Members IS
@@ -524,7 +590,6 @@ BEGIN
             DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
         END LOOP;
 END;
-
 -- Complex Procedure Generate_Utilization_Report
 /* Jan Haslik */
 CREATE OR REPLACE PROCEDURE Generate_Utilization_Report IS
@@ -562,7 +627,6 @@ BEGIN
             DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
         END LOOP;
 END;
-
 -- Report: Ship Fleet Value
 -- Description: This procedure calculates and prints the total value of ships owned by a specified owner,
 -- along with the individual value of each ship.
@@ -612,7 +676,6 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('--------------------------');
     DBMS_OUTPUT.PUT_LINE('Total value of ship fleet owned by owner ' || owner_id_in || ': ' || total_value);
 END;
-
 -- Report: Plane Fleet Value
 -- Description: This procedure calculates and prints the total value of planes owned by a specified owner,
 -- along with the individual value of each plane.
