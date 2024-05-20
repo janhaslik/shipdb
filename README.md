@@ -8,11 +8,11 @@ Deadline: 21.5.2023
 
 ## Anforderungen:
   + [x] Mindestens 10 Tabellen => (13 / 10)
-  + [ ] Mindestens 12 Sinvolle UseCases
+  + [ ] Mindestens 12 Sinnvolle UseCases
   + [ ] 2 Layer Architecture (Body + HelperFunctions)
-  + [ ] Exception Handling (Keine Businesslogik im Block)
+  + [x] Exception Handling (Keine Businesslogik im Block)
   + [ ] Logging (Tabelle)
-  + [ ] Trigger (Falls Sinnvoll) 
+  + [x] Trigger (Falls Sinnvoll) 
   + [ ] Tests (TestPackage)
 
 ## Beurteilung: 
