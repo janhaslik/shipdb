@@ -1,6 +1,7 @@
 -- Create database (PL/SQL does not directly create databases like MySQL)
 -- Assuming you're already connected to the correct schema/user in Oracle.
 
+--DROP TABLE Log;
 /*
 -- Drop Tables with Foreign Keys
 DROP TABLE planes_maintenances;
@@ -53,7 +54,7 @@ CREATE TABLE ships
     image        VARCHAR2(64),
     currentvalue VARCHAR2(64),
     year         DATE,
-    foreign key (owner) references owners(ownerid)
+    foreign key (owner) references owners (ownerid)
 );
 
 -- Create planes table
@@ -65,7 +66,7 @@ CREATE TABLE planes
     image        VARCHAR2(64),
     currentvalue VARCHAR2(64),
     year         DATE,
-    foreign key (owner) references owners(ownerid)
+    foreign key (owner) references owners (ownerid)
 );
 
 -- Create crewmembers table
@@ -91,7 +92,7 @@ CREATE TABLE ships_crewmembers
 CREATE TABLE planes_crewmembers
 (
     id         NUMBER PRIMARY KEY,
-    plane    NUMBER,
+    plane      NUMBER,
     crewmember NUMBER,
     CONSTRAINT planes_crewmembers_fk_planenr FOREIGN KEY (plane) REFERENCES planes (planenr),
     CONSTRAINT planes_crewmembers_fk_crewmember FOREIGN KEY (crewmember) REFERENCES crewmembers (crewmemberid),
@@ -133,10 +134,10 @@ CREATE TABLE planes_shipments
 -- Create maintenances table
 CREATE TABLE maintenances
 (
-    maintenanceid NUMBER PRIMARY KEY,
-    maintenanceDate          DATE,
-    type          VARCHAR2(20),
-    maintenanceDescription   varchar(200)
+    maintenanceid          NUMBER PRIMARY KEY,
+    maintenanceDate        DATE,
+    type                   VARCHAR2(20),
+    maintenanceDescription varchar(200)
 );
 
 -- Create ships_maintenances table
@@ -160,6 +161,15 @@ CREATE TABLE planes_maintenances
     CONSTRAINT planes_maintenances_fk_maintenanceid FOREIGN KEY (maintenanceid) REFERENCES maintenances (maintenanceid),
     CONSTRAINT planes_maintenances_unique_planenr_maintenanceid UNIQUE (planenr, maintenanceid)
 );
+-- Create Logging Table
+CREATE TABLE Log
+(
+    id          NUMBER GENERATED ALWAYS as IDENTITY(START with 1 INCREMENT by 1) PRIMARY KEY,
+    severity    VARCHAR2(15),
+    description VARCHAR2(100),
+    logDate DATE
+);
+
 -- Insert data into owners table
 INSERT INTO owners (ownerid, name, contactperson, contactemail)
 VALUES (1, 'Red-Haired Shanks', 'Shanks', 'shanks@example.com');
@@ -263,5 +273,6 @@ VALUES (3, 900, 3);
 INSERT INTO ships_maintenances (id, ship, maintenance)
 VALUES (4, 902, 4);
 
-select * from owners;
+select *
+from owners;
 
