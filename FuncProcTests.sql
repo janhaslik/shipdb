@@ -1,29 +1,137 @@
 -- Business logic
 
--- Add a owner
+-- Trigger to prevent Insertion between 23:00 and 05:00
 /* Jan Haslik */
-CREATE OR REPLACE FUNCTION add_owner(
-    v_ownerid_param IN NUMBER,
-    v_name_param IN VARCHAR2,
-    v_contactperson_param IN VARCHAR2,
-    v_contactemail_param IN VARCHAR2
-) RETURN VARCHAR2 IS
-BEGIN
-    INSERT INTO owners (ownerid, name, contactperson, contactemail)
-    VALUES (v_ownerid_param, v_name_param, v_contactperson_param, v_contactemail_param);
+create or replace trigger BusinessHoursTriggerShipments
+    before insert or update or delete
+    on SHIPMENTS
+    for each row
+begin
+    if sysdate between '23:00' and '05:00' then
+        raise_application_error(-20001, 'not allowed between 5 and 23');
+    end if;
+end;
+-- Trigger to prevent Insertion between 23:00 and 05:00
+/* Jan Haslik */
+create or replace trigger BusinessHoursTriggerMaintenances
+    before insert or update or delete
+    on MAINTENANCES
+    for each row
+begin
+    if sysdate between '23:00' and '05:00' then
+        raise_application_error(-20001, 'not allowed between 5 and 23');
+    end if;
+end;
 
-    COMMIT;
+CREATE OR REPLACE Package pkg_crud
+IS
+FUNCTION add_owner(
+v_ownerid_param IN NUMBER,
+v_name_param IN VARCHAR2,
+v_contactperson_param IN VARCHAR2,
+v_contactemail_param IN VARCHAR2
+) RETURN VARCHAR2;
+FUNCTION add_user(
+v_userid_param IN NUMBER,
+v_name_param IN VARCHAR2,
+v_email_param IN VARCHAR2,
+v_ownerid_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_ship(
+v_shipnr_param IN NUMBER,
+v_name_param IN VARCHAR2,
+v_owner_param IN NUMBER,
+v_type_param IN VARCHAR2,
+v_image_param IN VARCHAR2,
+v_currentvalue_param IN VARCHAR2,
+v_year_param IN DATE
+) RETURN VARCHAR2;
+FUNCTION add_plane(
+v_planenr_param IN NUMBER,
+v_owner_param IN NUMBER,
+v_type_param IN VARCHAR2,
+v_image_param IN VARCHAR2,
+v_currentvalue_param IN VARCHAR2,
+v_year_param IN DATE
+) RETURN VARCHAR2;
+function add_crewmember(
+v_crewmemberid_param IN NUMBER,
+v_name_param IN VARCHAR2,
+v_role_param IN VARCHAR2
+) RETURN VARCHAR2;
+FUNCTION add_ship_crewmember(
+v_id_param IN NUMBER,
+v_ship_param IN NUMBER,
+v_crewmember_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_plane_crewmember(
+v_id_param IN NUMBER,
+v_plane_param IN NUMBER,
+v_crewmember_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_shipment(
+    v_shipmentid_param IN NUMBER,
+    v_starttime_param IN DATE,
+    v_endtime_param IN DATE,
+    v_departurelocation_param IN VARCHAR2,
+    v_arrivallocation_param IN VARCHAR2
+) RETURN VARCHAR2;
+FUNCTION add_ship_shipment(
+    v_id_param IN NUMBER,
+    v_ship_param IN NUMBER,
+    v_shipment_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_plane_shipment(
+    v_id_param IN NUMBER,
+    v_plane_param IN NUMBER,
+    v_shipment_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_maintenance(
+v_maintenanceid_param IN NUMBER,
+v_maintenanceDate_param IN DATE,
+v_type_param IN VARCHAR2,
+v_maintenanceDescription_param IN VARCHAR2
+) RETURN VARCHAR2;
+FUNCTION add_ship_maintenance(
+v_id_param IN NUMBER,
+v_ship_param IN NUMBER,
+v_maintenance_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_plane_maintenance(
+v_id_param IN NUMBER,
+v_planenr_param IN NUMBER,
+v_maintenanceid_param IN NUMBER
+) RETURN VARCHAR2;
 
-    RETURN 'Owner added successfully';
-EXCEPTION
-    WHEN DUP_VAL_ON_INDEX THEN
-        RETURN 'Owner with the same ID already exists';
-    WHEN OTHERS THEN
-        RETURN 'Error adding owner';
-END add_owner;
+END pkg_crud;
+--###########################
+create or replace
+Package Body pkg_crud
+IS
+	-- Add a owner
+    /* Jan Haslik */
+    FUNCTION add_owner(
+        v_ownerid_param IN NUMBER,
+        v_name_param IN VARCHAR2,
+        v_contactperson_param IN VARCHAR2,
+        v_contactemail_param IN VARCHAR2
+    ) RETURN VARCHAR2 IS
+    BEGIN
+        INSERT INTO owners (ownerid, name, contactperson, contactemail)
+        VALUES (v_ownerid_param, v_name_param, v_contactperson_param, v_contactemail_param);
+
+        COMMIT;
+
+        RETURN 'Owner added successfully';
+    EXCEPTION
+        WHEN DUP_VAL_ON_INDEX THEN
+            RETURN 'Owner with the same ID already exists';
+        WHEN OTHERS THEN
+            RETURN 'Error adding owner';
+    END;
 -- Add a user
 /* Jan Haslik */
-CREATE OR REPLACE FUNCTION add_user(
+FUNCTION add_user(
     v_userid_param IN NUMBER,
     v_name_param IN VARCHAR2,
     v_email_param IN VARCHAR2,
@@ -48,10 +156,11 @@ EXCEPTION
         RETURN 'User with the same NR already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding user';
-END add_user;
+END;
+
 -- Add a ship
 /* Jan Haslik */
-CREATE OR REPLACE FUNCTION add_ship(
+FUNCTION add_ship(
     v_shipnr_param IN NUMBER,
     v_name_param IN VARCHAR2,
     v_owner_param IN NUMBER,
@@ -80,10 +189,11 @@ EXCEPTION
         RETURN 'Ship with the same NR already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding ship';
-END add_ship;
+END;
+
 -- Add a plane
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_plane(
+FUNCTION add_plane(
     v_planenr_param IN NUMBER,
     v_owner_param IN NUMBER,
     v_type_param IN VARCHAR2,
@@ -111,9 +221,10 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Plane';
 END add_plane;
+
 -- Add a crewmember
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_crewmember(
+FUNCTION add_crewmember(
     v_crewmemberid_param IN NUMBER,
     v_name_param IN VARCHAR2,
     v_role_param IN VARCHAR2
@@ -131,9 +242,10 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Crewmember';
 END add_crewmember;
+
 -- Add a crewmember to a ship
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_ship_crewmember(
+FUNCTION add_ship_crewmember(
     v_id_param IN NUMBER,
     v_ship_param IN NUMBER,
     v_crewmember_param IN NUMBER
@@ -164,9 +276,10 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Ships_Crewmember';
 END add_ship_crewmember;
+
 -- Add a crewmember to a plane
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_plane_crewmember(
+FUNCTION add_plane_crewmember(
     v_id_param IN NUMBER,
     v_plane_param IN NUMBER,
     v_crewmember_param IN NUMBER
@@ -197,9 +310,10 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Plane_Crewmember';
 END add_plane_crewmember;
+
 -- Add a shipment
 /* Daniel Kunesch*/
-CREATE OR REPLACE FUNCTION add_shipment(
+FUNCTION add_shipment(
     v_shipmentid_param IN NUMBER,
     v_starttime_param IN DATE,
     v_endtime_param IN DATE,
@@ -218,10 +332,11 @@ EXCEPTION
         RETURN 'Shipment with the same ID already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding Shipment';
-END add_shipment;
+END;
+
 -- Add a shipment to a ship
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_ship_shipment(
+FUNCTION add_ship_shipment(
     v_id_param IN NUMBER,
     v_ship_param IN NUMBER,
     v_shipment_param IN NUMBER
@@ -251,10 +366,11 @@ EXCEPTION
         RETURN 'Ships_Shipment with the same id or combination already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding Ships_Shipment';
-END add_ship_shipment;
+END;
+
 -- Add a shipment to a plane
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_plane_shipment(
+FUNCTION add_plane_shipment(
     v_id_param IN NUMBER,
     v_plane_param IN NUMBER,
     v_shipment_param IN NUMBER
@@ -284,10 +400,11 @@ EXCEPTION
         RETURN 'Planes_Shipment with the same id or combination already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding Planes_Shipment';
-END add_plane_shipment;
+END;
+
 -- Add a maintenance
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_maintenance(
+FUNCTION add_maintenance(
     v_maintenanceid_param IN NUMBER,
     v_maintenanceDate_param IN DATE,
     v_type_param IN VARCHAR2,
@@ -306,9 +423,10 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Maintenance';
 END add_maintenance;
+
 -- Schedule a Maintenance for a Ship
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_ship_maintenance(
+FUNCTION add_ship_maintenance(
     v_id_param IN NUMBER,
     v_ship_param IN NUMBER,
     v_maintenance_param IN NUMBER
@@ -338,10 +456,11 @@ EXCEPTION
         RETURN 'Ships_Maintenance with the same id or combination already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding Ships_Maintenance';
-END add_ship_maintenance;
+END;
+
 -- Schedule a Maintenance for a Plane
 /* Daniel Kunesch*/
-CREATE OR REPLACE FUNCTION add_plane_maintenance(
+FUNCTION add_plane_maintenance(
     v_id_param IN NUMBER,
     v_planenr_param IN NUMBER,
     v_maintenanceid_param IN NUMBER
@@ -371,33 +490,27 @@ EXCEPTION
         RETURN 'Planes_Maintenance with the same id or combination already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding Planes_Maintenance';
-END add_plane_maintenance;
+END;
 
--- Trigger to prevent Insertion between 23:00 and 05:00
-/* Jan Haslik */
-create or replace trigger BusinessHoursTriggerShipments
-    before insert or update or delete
-    on SHIPMENTS
-    for each row
-begin
-    if sysdate between '23:00' and '05:00' then
-        raise_application_error(-20001, 'not allowed between 5 and 23');
-    end if;
-end;
--- Trigger to prevent Insertion between 23:00 and 05:00
-/* Jan Haslik */
-create or replace trigger BusinessHoursTriggerMaintenances
-    before insert or update or delete
-    on MAINTENANCES
-    for each row
-begin
-    if sysdate between '23:00' and '05:00' then
-        raise_application_error(-20001, 'not allowed between 5 and 23');
-    end if;
-end;
+END pkg_crud;
+
+CREATE OR REPLACE Package pkg_reports
+IS
+	PROCEDURE Generate_Owner_Plane_Fleet_Report(p_ownerid IN NUMBER);
+    PROCEDURE Generate_Owner_Ship_Fleet_Report(p_ownerid IN NUMBER);
+    PROCEDURE Identify_Unassigned_Crew_Members;
+    PROCEDURE Generate_Utilization_Report;
+    PROCEDURE Generate_Ship_Fleet_Value_Report(owner_id_in IN NUMBER);
+    PROCEDURE Generate_Ships_Value_Report(owner_id_in IN NUMBER);
+END pkg_reports;
+
+create or replace
+Package Body pkg_reports
+IS
+
 -- Complex Procedure Generate_Owner_Plane_Fleet_Report
 /* Jan Haslik */
-CREATE OR REPLACE PROCEDURE Generate_Owner_Plane_Fleet_Report(p_ownerid IN NUMBER) IS
+PROCEDURE Generate_Owner_Plane_Fleet_Report(p_ownerid IN NUMBER) IS
 BEGIN
     -- Output owner details
     FOR owner_rec IN (
@@ -481,96 +594,98 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('No fleet found for owner with ID: ' || p_ownerid);
     END IF;
 END;
+
 -- Complex Procedure Generate_Owner_Ship_Fleet_Report
 /* Jan Haslik */
-CREATE OR REPLACE PROCEDURE Generate_Owner_Ship_Fleet_Report(p_ownerid IN NUMBER) IS
+PROCEDURE Generate_Owner_Ship_Fleet_Report(p_ownerid IN NUMBER) IS
 BEGIN
-    -- Output owner details
-    FOR owner_rec IN (
-        SELECT name, contactperson, contactemail
-        FROM owners
-        WHERE ownerid = p_ownerid
-        )
-        LOOP
-            DBMS_OUTPUT.PUT_LINE('Owner: ' || owner_rec.name);
-            DBMS_OUTPUT.PUT_LINE('Contact Person: ' || owner_rec.contactperson);
-            DBMS_OUTPUT.PUT_LINE('Contact Email: ' || owner_rec.contactemail);
-            DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
-        END LOOP;
+-- Output owner details
+FOR owner_rec IN (
+    SELECT name, contactperson, contactemail
+    FROM owners
+    WHERE ownerid = p_ownerid
+    )
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Owner: ' || owner_rec.name);
+        DBMS_OUTPUT.PUT_LINE('Contact Person: ' || owner_rec.contactperson);
+        DBMS_OUTPUT.PUT_LINE('Contact Email: ' || owner_rec.contactemail);
+        DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
+    END LOOP;
 
-    -- Output ships details
-    FOR ship_rec IN (
-        SELECT shipnr, name, type, image, currentvalue, year
-        FROM ships
-        WHERE owner = p_ownerid
-        )
-        LOOP
-            DBMS_OUTPUT.PUT_LINE('Ship Number: ' || ship_rec.shipnr);
-            DBMS_OUTPUT.PUT_LINE('Name: ' || ship_rec.name);
-            DBMS_OUTPUT.PUT_LINE('Type: ' || ship_rec.type);
-            DBMS_OUTPUT.PUT_LINE('Image: ' || ship_rec.image);
-            DBMS_OUTPUT.PUT_LINE('Current Value: ' || ship_rec.currentvalue);
-            DBMS_OUTPUT.PUT_LINE('Year: ' || TO_CHAR(ship_rec.year, 'YYYY'));
-            DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
+-- Output ships details
+FOR ship_rec IN (
+    SELECT shipnr, name, type, image, currentvalue, year
+    FROM ships
+    WHERE owner = p_ownerid
+    )
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Ship Number: ' || ship_rec.shipnr);
+        DBMS_OUTPUT.PUT_LINE('Name: ' || ship_rec.name);
+        DBMS_OUTPUT.PUT_LINE('Type: ' || ship_rec.type);
+        DBMS_OUTPUT.PUT_LINE('Image: ' || ship_rec.image);
+        DBMS_OUTPUT.PUT_LINE('Current Value: ' || ship_rec.currentvalue);
+        DBMS_OUTPUT.PUT_LINE('Year: ' || TO_CHAR(ship_rec.year, 'YYYY'));
+        DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
 
-            -- Output associated crewmembers
-            DBMS_OUTPUT.PUT_LINE('Crewmembers:');
-            FOR crew_rec IN (
-                SELECT c.name, c.role
-                FROM crewmembers c
-                         JOIN ships_crewmembers sc ON c.crewmemberid = sc.crewmember
-                WHERE sc.ship = ship_rec.shipnr
-                )
-                LOOP
-                    DBMS_OUTPUT.PUT_LINE('    Name: ' || crew_rec.name || ', Role: ' || crew_rec.role);
-                END LOOP;
+        -- Output associated crewmembers
+        DBMS_OUTPUT.PUT_LINE('Crewmembers:');
+        FOR crew_rec IN (
+            SELECT c.name, c.role
+            FROM crewmembers c
+                     JOIN ships_crewmembers sc ON c.crewmemberid = sc.crewmember
+            WHERE sc.ship = ship_rec.shipnr
+            )
+            LOOP
+                DBMS_OUTPUT.PUT_LINE('    Name: ' || crew_rec.name || ', Role: ' || crew_rec.role);
+            END LOOP;
 
-            DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
+        DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
 
-            -- Output associated shipments
-            DBMS_OUTPUT.PUT_LINE('Shipments:');
-            FOR shipment_rec IN (
-                SELECT s.shipmentid, s.starttime, s.endtime, s.departurelocation, s.arrivallocation
-                FROM shipments s
-                         JOIN ships_shipments ss ON s.shipmentid = ss.shipment
-                WHERE ss.ship = ship_rec.shipnr
-                )
-                LOOP
-                    DBMS_OUTPUT.PUT_LINE('    Shipment ID: ' || shipment_rec.shipmentid);
-                    DBMS_OUTPUT.PUT_LINE('    Departure: ' || shipment_rec.departurelocation || ', Arrival: ' ||
-                                         shipment_rec.arrivallocation);
-                    DBMS_OUTPUT.PUT_LINE('    Start Time: ' || shipment_rec.starttime || ', End Time: ' ||
-                                         shipment_rec.endtime);
-                END LOOP;
+        -- Output associated shipments
+        DBMS_OUTPUT.PUT_LINE('Shipments:');
+        FOR shipment_rec IN (
+            SELECT s.shipmentid, s.starttime, s.endtime, s.departurelocation, s.arrivallocation
+            FROM shipments s
+                     JOIN ships_shipments ss ON s.shipmentid = ss.shipment
+            WHERE ss.ship = ship_rec.shipnr
+            )
+            LOOP
+                DBMS_OUTPUT.PUT_LINE('    Shipment ID: ' || shipment_rec.shipmentid);
+                DBMS_OUTPUT.PUT_LINE('    Departure: ' || shipment_rec.departurelocation || ', Arrival: ' ||
+                                     shipment_rec.arrivallocation);
+                DBMS_OUTPUT.PUT_LINE('    Start Time: ' || shipment_rec.starttime || ', End Time: ' ||
+                                     shipment_rec.endtime);
+            END LOOP;
 
-            DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
+        DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
 
-            -- Output associated maintenances
-            DBMS_OUTPUT.PUT_LINE('Maintenances:');
-            FOR maintenance_rec IN (
-                SELECT m.maintenanceid, m.maintenanceDate, m.type, m.maintenanceDescription
-                FROM maintenances m
-                         JOIN ships_maintenances sm ON m.maintenanceid = sm.maintenance
-                WHERE sm.ship = ship_rec.shipnr
-                )
-                LOOP
-                    DBMS_OUTPUT.PUT_LINE('    Maintenance ID: ' || maintenance_rec.maintenanceid);
-                    DBMS_OUTPUT.PUT_LINE('    Date: ' || maintenance_rec.maintenanceDate);
-                    DBMS_OUTPUT.PUT_LINE('    Type: ' || maintenance_rec.type);
-                    DBMS_OUTPUT.PUT_LINE('    Description: ' || maintenance_rec.maintenanceDescription);
-                END LOOP;
+        -- Output associated maintenances
+        DBMS_OUTPUT.PUT_LINE('Maintenances:');
+        FOR maintenance_rec IN (
+            SELECT m.maintenanceid, m.maintenanceDate, m.type, m.maintenanceDescription
+            FROM maintenances m
+                     JOIN ships_maintenances sm ON m.maintenanceid = sm.maintenance
+            WHERE sm.ship = ship_rec.shipnr
+            )
+            LOOP
+                DBMS_OUTPUT.PUT_LINE('    Maintenance ID: ' || maintenance_rec.maintenanceid);
+                DBMS_OUTPUT.PUT_LINE('    Date: ' || maintenance_rec.maintenanceDate);
+                DBMS_OUTPUT.PUT_LINE('    Type: ' || maintenance_rec.type);
+                DBMS_OUTPUT.PUT_LINE('    Description: ' || maintenance_rec.maintenanceDescription);
+            END LOOP;
 
-            DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
-        END LOOP;
+        DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
+    END LOOP;
 
-    -- Check if no ships or planes found
-    IF SQL%ROWCOUNT = 0 THEN
-        DBMS_OUTPUT.PUT_LINE('No fleet found for owner with ID: ' || p_ownerid);
-    END IF;
+-- Check if no ships or planes found
+IF SQL%ROWCOUNT = 0 THEN
+    DBMS_OUTPUT.PUT_LINE('No fleet found for owner with ID: ' || p_ownerid);
+END IF;
 END;
+
 -- Complex Procedure Identify_Unassigned_Crew_Members
 /* Jan Haslik*/
-CREATE OR REPLACE PROCEDURE Identify_Unassigned_Crew_Members IS
+PROCEDURE Identify_Unassigned_Crew_Members IS
 BEGIN
     DBMS_OUTPUT.PUT_LINE('Unassigned Crew Members');
     DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
@@ -590,9 +705,10 @@ BEGIN
             DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
         END LOOP;
 END;
+
 -- Complex Procedure Generate_Utilization_Report
 /* Jan Haslik */
-CREATE OR REPLACE PROCEDURE Generate_Utilization_Report IS
+PROCEDURE Generate_Utilization_Report IS
 BEGIN
     DBMS_OUTPUT.PUT_LINE('Utilization Report');
     DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
@@ -627,6 +743,7 @@ BEGIN
             DBMS_OUTPUT.PUT_LINE('-------------------------------------------------');
         END LOOP;
 END;
+
 -- Report: Ship Fleet Value
 -- Description: This procedure calculates and prints the total value of ships owned by a specified owner,
 -- along with the individual value of each ship.
@@ -634,7 +751,7 @@ END;
 -- Output: Prints the total value of the ship fleet owned by the specified owner,
 -- as well as the value of each ship.
 /* Daniel Kunesch */
-CREATE OR REPLACE PROCEDURE Generate_Ship_Fleet_Value_Report(owner_id_in IN NUMBER) IS
+PROCEDURE Generate_Ship_Fleet_Value_Report(owner_id_in IN NUMBER) IS
     total_value   NUMBER := 0;
     owner_name    VARCHAR2(100);
 BEGIN
@@ -683,7 +800,7 @@ END;
 -- Output: Prints the total value of the plane fleet owned by the specified owner,
 -- as well as the value of each plane.
 /* Jan Haslik */
-CREATE OR REPLACE PROCEDURE Generate_Ships_Value_Report(owner_id_in IN NUMBER) IS
+PROCEDURE Generate_Ships_Value_Report(owner_id_in IN NUMBER) IS
     total_value   NUMBER := 0;
     owner_name    VARCHAR2(100);
 BEGIN
@@ -724,6 +841,200 @@ BEGIN
     -- Print the total fleet value
     DBMS_OUTPUT.PUT_LINE('--------------------------');
     DBMS_OUTPUT.PUT_LINE('Total value of plane fleet owned by owner ' || owner_id_in || ': ' || total_value);
+END;
+
+END pkg_reports;
+
+CREATE OR REPLACE PACKAGE pkg_crud_test IS
+    PROCEDURE test_add_owner;
+    PROCEDURE test_add_user;
+    PROCEDURE test_add_ship;
+    PROCEDURE test_add_plane;
+    PROCEDURE test_add_crewmember;
+    PROCEDURE test_add_ship_crewmember;
+    PROCEDURE test_add_plane_crewmember;
+    PROCEDURE test_add_shipment;
+    PROCEDURE test_add_ship_shipment;
+    PROCEDURE test_add_plane_shipment;
+    PROCEDURE test_add_maintenance;
+    PROCEDURE test_add_ship_maintenance;
+    PROCEDURE test_add_plane_maintenance;
+END pkg_crud_test;
+
+CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
+
+    PROCEDURE test_add_owner IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Owner:');
+        v_result := pkg_crud.add_owner(1, 'Test Owner', 'Test Contact', 'contact@test.com');
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Owner: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_owner: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_user IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add User:');
+        v_result := pkg_crud.add_user(1, 'Test User', 'user@test.com', 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add User: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_user: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_ship IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Ship:');
+        v_result := pkg_crud.add_ship(1, 'Test Ship', 1, 'Cargo', 'image.png', '1000000', TO_DATE('2020-01-01', 'YYYY-MM-DD'));
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Ship: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_ship: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_plane IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Plane:');
+        v_result := pkg_crud.add_plane(1, 1, 'Passenger', 'image.png', '2000000', TO_DATE('2019-01-01', 'YYYY-MM-DD'));
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add User: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_plane: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_crewmember IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember:');
+        v_result := pkg_crud.add_crewmember(1, 'Joe', 'Pilot');
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_crewmember: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_ship_crewmember IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Ship:');
+        v_result := pkg_crud.add_ship_crewmember(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Ship: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_ship_crewmember: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_plane_crewmember IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Plane:');
+        v_result := pkg_crud.add_plane_crewmember(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Plane: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_plane_crewmember: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_shipment IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment:');
+        v_result := pkg_crud.add_shipment(1, TO_DATE('2023-01-01 10:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_DATE('2023-01-01 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'New York', 'Los Angeles');
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_shipment: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_ship_shipment IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Ship:');
+        v_result := pkg_crud.add_ship_shipment(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Ship: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_ship_shipment: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_plane_shipment IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Plane:');
+        v_result := pkg_crud.add_plane_shipment(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Plane: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_plane_shipment: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_maintenance IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance:');
+        v_result := pkg_crud.add_maintenance(1, TO_DATE('2023-02-01', 'YYYY-MM-DD'), 'Engine Check', 'Routine engine maintenance');
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_maintenance: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_ship_maintenance IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Ship:');
+        v_result := pkg_crud.add_ship_maintenance(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Ship: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_ship_maintenance: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_plane_maintenance IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Plane:');
+        v_result := pkg_crud.add_plane_maintenance(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Plane: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_plane_maintenance: ' || SQLERRM);
+    END;
+
+END pkg_crud_test;
+
+BEGIN
+    pkg_crud_test.test_add_owner;
+    pkg_crud_test.test_add_user;
+    pkg_crud_test.test_add_ship;
+    pkg_crud_test.test_add_plane;
+    pkg_crud_test.test_add_crewmember;
+    pkg_crud_test.test_add_ship_crewmember;
+    pkg_crud_test.test_add_plane_crewmember;
+    pkg_crud_test.test_add_shipment;
+    pkg_crud_test.test_add_ship_shipment;
+    pkg_crud_test.test_add_plane_shipment;
+    pkg_crud_test.test_add_maintenance;
+    pkg_crud_test.test_add_ship_maintenance;
+    pkg_crud_test.test_add_plane_maintenance;
 END;
 
 
