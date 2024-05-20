@@ -1,29 +1,136 @@
 -- Business logic
-
--- Add a owner
+-- Trigger to prevent Insertion between 23:00 and 05:00
 /* Jan Haslik */
-CREATE OR REPLACE FUNCTION add_owner(
-    v_ownerid_param IN NUMBER,
-    v_name_param IN VARCHAR2,
-    v_contactperson_param IN VARCHAR2,
-    v_contactemail_param IN VARCHAR2
-) RETURN VARCHAR2 IS
-BEGIN
-    INSERT INTO owners (ownerid, name, contactperson, contactemail)
-    VALUES (v_ownerid_param, v_name_param, v_contactperson_param, v_contactemail_param);
+create or replace trigger BusinessHoursTriggerShipments
+    before insert or update or delete
+    on SHIPMENTS
+    for each row
+begin
+    if sysdate between '23:00' and '05:00' then
+        raise_application_error(-20001, 'not allowed between 5 and 23');
+    end if;
+end;
+-- Trigger to prevent Insertion between 23:00 and 05:00
+/* Jan Haslik */
+create or replace trigger BusinessHoursTriggerMaintenances
+    before insert or update or delete
+    on MAINTENANCES
+    for each row
+begin
+    if sysdate between '23:00' and '05:00' then
+        raise_application_error(-20001, 'not allowed between 5 and 23');
+    end if;
+end;
 
-    COMMIT;
+CREATE OR REPLACE Package pkg_crud
+IS
+FUNCTION add_owner(
+v_ownerid_param IN NUMBER,
+v_name_param IN VARCHAR2,
+v_contactperson_param IN VARCHAR2,
+v_contactemail_param IN VARCHAR2
+) RETURN VARCHAR2;
+FUNCTION add_user(
+v_userid_param IN NUMBER,
+v_name_param IN VARCHAR2,
+v_email_param IN VARCHAR2,
+v_ownerid_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_ship(
+v_shipnr_param IN NUMBER,
+v_name_param IN VARCHAR2,
+v_owner_param IN NUMBER,
+v_type_param IN VARCHAR2,
+v_image_param IN VARCHAR2,
+v_currentvalue_param IN VARCHAR2,
+v_year_param IN DATE
+) RETURN VARCHAR2;
+FUNCTION add_plane(
+v_planenr_param IN NUMBER,
+v_owner_param IN NUMBER,
+v_type_param IN VARCHAR2,
+v_image_param IN VARCHAR2,
+v_currentvalue_param IN VARCHAR2,
+v_year_param IN DATE
+) RETURN VARCHAR2;
+function add_crewmember(
+v_crewmemberid_param IN NUMBER,
+v_name_param IN VARCHAR2,
+v_role_param IN VARCHAR2
+) RETURN VARCHAR2;
+FUNCTION add_ship_crewmember(
+v_id_param IN NUMBER,
+v_ship_param IN NUMBER,
+v_crewmember_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_plane_crewmember(
+v_id_param IN NUMBER,
+v_plane_param IN NUMBER,
+v_crewmember_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_shipment(
+    v_shipmentid_param IN NUMBER,
+    v_starttime_param IN DATE,
+    v_endtime_param IN DATE,
+    v_departurelocation_param IN VARCHAR2,
+    v_arrivallocation_param IN VARCHAR2
+) RETURN VARCHAR2;
+FUNCTION add_ship_shipment(
+    v_id_param IN NUMBER,
+    v_ship_param IN NUMBER,
+    v_shipment_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_plane_shipment(
+    v_id_param IN NUMBER,
+    v_plane_param IN NUMBER,
+    v_shipment_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_maintenance(
+v_maintenanceid_param IN NUMBER,
+v_maintenanceDate_param IN DATE,
+v_type_param IN VARCHAR2,
+v_maintenanceDescription_param IN VARCHAR2
+) RETURN VARCHAR2;
+FUNCTION add_ship_maintenance(
+v_id_param IN NUMBER,
+v_ship_param IN NUMBER,
+v_maintenance_param IN NUMBER
+) RETURN VARCHAR2;
+FUNCTION add_plane_maintenance(
+v_id_param IN NUMBER,
+v_planenr_param IN NUMBER,
+v_maintenanceid_param IN NUMBER
+) RETURN VARCHAR2;
 
-    RETURN 'Owner added successfully';
-EXCEPTION
-    WHEN DUP_VAL_ON_INDEX THEN
-        RETURN 'Owner with the same ID already exists';
-    WHEN OTHERS THEN
-        RETURN 'Error adding owner';
-END add_owner;
+END pkg_crud;
+--###########################
+create or replace
+Package Body pkg_crud
+IS
+	-- Add a owner
+    /* Jan Haslik */
+    FUNCTION add_owner(
+        v_ownerid_param IN NUMBER,
+        v_name_param IN VARCHAR2,
+        v_contactperson_param IN VARCHAR2,
+        v_contactemail_param IN VARCHAR2
+    ) RETURN VARCHAR2 IS
+    BEGIN
+        INSERT INTO owners (ownerid, name, contactperson, contactemail)
+        VALUES (v_ownerid_param, v_name_param, v_contactperson_param, v_contactemail_param);
+
+        COMMIT;
+
+        RETURN 'Owner added successfully';
+    EXCEPTION
+        WHEN DUP_VAL_ON_INDEX THEN
+            RETURN 'Owner with the same ID already exists';
+        WHEN OTHERS THEN
+            RETURN 'Error adding owner';
+    END;
 -- Add a user
 /* Jan Haslik */
-CREATE OR REPLACE FUNCTION add_user(
+FUNCTION add_user(
     v_userid_param IN NUMBER,
     v_name_param IN VARCHAR2,
     v_email_param IN VARCHAR2,
@@ -48,10 +155,11 @@ EXCEPTION
         RETURN 'User with the same NR already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding user';
-END add_user;
+END;
+
 -- Add a ship
 /* Jan Haslik */
-CREATE OR REPLACE FUNCTION add_ship(
+FUNCTION add_ship(
     v_shipnr_param IN NUMBER,
     v_name_param IN VARCHAR2,
     v_owner_param IN NUMBER,
@@ -80,10 +188,11 @@ EXCEPTION
         RETURN 'Ship with the same NR already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding ship';
-END add_ship;
+END;
+
 -- Add a plane
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_plane(
+FUNCTION add_plane(
     v_planenr_param IN NUMBER,
     v_owner_param IN NUMBER,
     v_type_param IN VARCHAR2,
@@ -111,9 +220,10 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Plane';
 END add_plane;
+
 -- Add a crewmember
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_crewmember(
+FUNCTION add_crewmember(
     v_crewmemberid_param IN NUMBER,
     v_name_param IN VARCHAR2,
     v_role_param IN VARCHAR2
@@ -131,9 +241,10 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Crewmember';
 END add_crewmember;
+
 -- Add a crewmember to a ship
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_ship_crewmember(
+FUNCTION add_ship_crewmember(
     v_id_param IN NUMBER,
     v_ship_param IN NUMBER,
     v_crewmember_param IN NUMBER
@@ -164,9 +275,10 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Ships_Crewmember';
 END add_ship_crewmember;
+
 -- Add a crewmember to a plane
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_plane_crewmember(
+FUNCTION add_plane_crewmember(
     v_id_param IN NUMBER,
     v_plane_param IN NUMBER,
     v_crewmember_param IN NUMBER
@@ -197,9 +309,10 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Plane_Crewmember';
 END add_plane_crewmember;
+
 -- Add a shipment
 /* Daniel Kunesch*/
-CREATE OR REPLACE FUNCTION add_shipment(
+FUNCTION add_shipment(
     v_shipmentid_param IN NUMBER,
     v_starttime_param IN DATE,
     v_endtime_param IN DATE,
@@ -218,10 +331,11 @@ EXCEPTION
         RETURN 'Shipment with the same ID already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding Shipment';
-END add_shipment;
+END;
+
 -- Add a shipment to a ship
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_ship_shipment(
+FUNCTION add_ship_shipment(
     v_id_param IN NUMBER,
     v_ship_param IN NUMBER,
     v_shipment_param IN NUMBER
@@ -251,10 +365,11 @@ EXCEPTION
         RETURN 'Ships_Shipment with the same id or combination already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding Ships_Shipment';
-END add_ship_shipment;
+END;
+
 -- Add a shipment to a plane
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_plane_shipment(
+FUNCTION add_plane_shipment(
     v_id_param IN NUMBER,
     v_plane_param IN NUMBER,
     v_shipment_param IN NUMBER
@@ -284,10 +399,11 @@ EXCEPTION
         RETURN 'Planes_Shipment with the same id or combination already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding Planes_Shipment';
-END add_plane_shipment;
+END;
+
 -- Add a maintenance
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_maintenance(
+FUNCTION add_maintenance(
     v_maintenanceid_param IN NUMBER,
     v_maintenanceDate_param IN DATE,
     v_type_param IN VARCHAR2,
@@ -306,9 +422,10 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN 'Error adding Maintenance';
 END add_maintenance;
+
 -- Schedule a Maintenance for a Ship
 /* Daniel Kunesch */
-CREATE OR REPLACE FUNCTION add_ship_maintenance(
+FUNCTION add_ship_maintenance(
     v_id_param IN NUMBER,
     v_ship_param IN NUMBER,
     v_maintenance_param IN NUMBER
@@ -338,10 +455,11 @@ EXCEPTION
         RETURN 'Ships_Maintenance with the same id or combination already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding Ships_Maintenance';
-END add_ship_maintenance;
+END;
+
 -- Schedule a Maintenance for a Plane
 /* Daniel Kunesch*/
-CREATE OR REPLACE FUNCTION add_plane_maintenance(
+FUNCTION add_plane_maintenance(
     v_id_param IN NUMBER,
     v_planenr_param IN NUMBER,
     v_maintenanceid_param IN NUMBER
@@ -371,30 +489,42 @@ EXCEPTION
         RETURN 'Planes_Maintenance with the same id or combination already exists';
     WHEN OTHERS THEN
         RETURN 'Error adding Planes_Maintenance';
-END add_plane_maintenance;
+END;
 
--- Trigger to prevent Insertion between 23:00 and 05:00
-/* Jan Haslik */
-create or replace trigger BusinessHoursTriggerShipments
-    before insert or update or delete
-    on SHIPMENTS
-    for each row
-begin
-    if sysdate between '23:00' and '05:00' then
-        raise_application_error(-20001, 'not allowed between 5 and 23');
-    end if;
-end;
--- Trigger to prevent Insertion between 23:00 and 05:00
-/* Jan Haslik */
-create or replace trigger BusinessHoursTriggerMaintenances
-    before insert or update or delete
-    on MAINTENANCES
-    for each row
-begin
-    if sysdate between '23:00' and '05:00' then
-        raise_application_error(-20001, 'not allowed between 5 and 23');
-    end if;
-end;
+END pkg_crud;
+
+CREATE OR REPLACE Package pkg_reports
+IS
+	v_pi constant decimal(5,2) := 3.141;
+	FUNCTION area_circle(v_radius decimal) RETURN Decimal;
+	FUNCTION area_rectangle (v_x decimal, v_y  decimal) RETURN Decimal;
+END pkg_reports;
+
+
+create or replace
+Package Body pkg_reports
+IS
+    -- private
+    FUNCTION get_value return number
+    is
+    begin
+        return 5;
+    end;
+
+	--#### Function area Circlce   #####
+	FUNCTION area_circle(v_radius decimal) RETURN Decimal
+	is
+    BEGIN
+      return v_radius*v_radius*v_pi;
+    end;
+	--#### Function area Rectangle #####
+	FUNCTION area_rectangle(v_x decimal,v_y decimal) RETURN Decimal
+	is
+	Begin
+		return v_x*v_y*get_value;
+	end;
+END pkg_reports;
+
 -- Complex Procedure Generate_Owner_Plane_Fleet_Report
 /* Jan Haslik */
 CREATE OR REPLACE PROCEDURE Generate_Owner_Plane_Fleet_Report(p_ownerid IN NUMBER) IS

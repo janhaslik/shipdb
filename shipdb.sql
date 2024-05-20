@@ -264,3 +264,4 @@ INSERT INTO ships_maintenances (id, ship, maintenance)
 VALUES (4, 902, 4);
 
 select * from owners;
+
