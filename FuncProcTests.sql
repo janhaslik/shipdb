@@ -844,3 +844,198 @@ BEGIN
 END;
 
 END pkg_reports;
+
+CREATE OR REPLACE PACKAGE pkg_crud_test IS
+    PROCEDURE test_add_owner;
+    PROCEDURE test_add_user;
+    PROCEDURE test_add_ship;
+    PROCEDURE test_add_plane;
+    PROCEDURE test_add_crewmember;
+    PROCEDURE test_add_ship_crewmember;
+    PROCEDURE test_add_plane_crewmember;
+    PROCEDURE test_add_shipment;
+    PROCEDURE test_add_ship_shipment;
+    PROCEDURE test_add_plane_shipment;
+    PROCEDURE test_add_maintenance;
+    PROCEDURE test_add_ship_maintenance;
+    PROCEDURE test_add_plane_maintenance;
+END pkg_crud_test;
+
+CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
+
+    PROCEDURE test_add_owner IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Owner:');
+        v_result := pkg_crud.add_owner(1, 'Test Owner', 'Test Contact', 'contact@test.com');
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Owner: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_owner: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_user IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add User:');
+        v_result := pkg_crud.add_user(1, 'Test User', 'user@test.com', 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add User: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_user: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_ship IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Ship:');
+        v_result := pkg_crud.add_ship(1, 'Test Ship', 1, 'Cargo', 'image.png', '1000000', TO_DATE('2020-01-01', 'YYYY-MM-DD'));
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Ship: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_ship: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_plane IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Plane:');
+        v_result := pkg_crud.add_plane(1, 1, 'Passenger', 'image.png', '2000000', TO_DATE('2019-01-01', 'YYYY-MM-DD'));
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add User: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_plane: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_crewmember IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember:');
+        v_result := pkg_crud.add_crewmember(1, 'Joe', 'Pilot');
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_crewmember: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_ship_crewmember IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Ship:');
+        v_result := pkg_crud.add_ship_crewmember(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Ship: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_ship_crewmember: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_plane_crewmember IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Plane:');
+        v_result := pkg_crud.add_plane_crewmember(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Plane: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_plane_crewmember: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_shipment IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment:');
+        v_result := pkg_crud.add_shipment(1, TO_DATE('2023-01-01 10:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_DATE('2023-01-01 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'New York', 'Los Angeles');
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_shipment: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_ship_shipment IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Ship:');
+        v_result := pkg_crud.add_ship_shipment(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Ship: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_ship_shipment: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_plane_shipment IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Plane:');
+        v_result := pkg_crud.add_plane_shipment(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Plane: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_plane_shipment: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_maintenance IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance:');
+        v_result := pkg_crud.add_maintenance(1, TO_DATE('2023-02-01', 'YYYY-MM-DD'), 'Engine Check', 'Routine engine maintenance');
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_maintenance: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_ship_maintenance IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Ship:');
+        v_result := pkg_crud.add_ship_maintenance(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Ship: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_ship_maintenance: ' || SQLERRM);
+    END;
+
+    PROCEDURE test_add_plane_maintenance IS
+        v_result VARCHAR2(100);
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Plane:');
+        v_result := pkg_crud.add_plane_maintenance(1, 1, 1);
+        DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
+        DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Plane: Test successful');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error in test_add_plane_maintenance: ' || SQLERRM);
+    END;
+
+END pkg_crud_test;
+
+BEGIN
+    pkg_crud_test.test_add_owner;
+    pkg_crud_test.test_add_user;
+    pkg_crud_test.test_add_ship;
+    pkg_crud_test.test_add_plane;
+    pkg_crud_test.test_add_crewmember;
+    pkg_crud_test.test_add_ship_crewmember;
+    pkg_crud_test.test_add_plane_crewmember;
+    pkg_crud_test.test_add_shipment;
+    pkg_crud_test.test_add_ship_shipment;
+    pkg_crud_test.test_add_plane_shipment;
+    pkg_crud_test.test_add_maintenance;
+    pkg_crud_test.test_add_ship_maintenance;
+    pkg_crud_test.test_add_plane_maintenance;
+END;
+
+
+
