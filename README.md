@@ -14,11 +14,13 @@ Deadline: 21.5.2023
   + [x] Logging (Tabelle)
   + [x] Trigger (Falls Sinnvoll) 
   + [x] Tests (TestPackage)
+  + [x] Dokumentation
+  + [x] Präsentation
 
 ## Beurteilung: 
-  + [x] Use-Cases (20% - 40%, nach Komplexität) (Schwiergikeit der Abfragen, Control Statements, Cursor, …)
-  + [x] Layers (10%)
-  + [x] Logging (10%)
-  + [x] Tests (20%)
+  + [ ] Use-Cases (20% - 40%, nach Komplexität) (Schwiergikeit der Abfragen, Control Statements, Cursor, …)
+  + [ ] Layers (10%)
+  + [ ] Logging (10%)
+  + [ ] Tests (20%)
   + [ ] Dokumentation (10%)
   + [ ] Präsentation (10%)
