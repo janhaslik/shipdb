@@ -41,7 +41,7 @@ CREATE TABLE users
     userid  NUMBER PRIMARY KEY,
     name    VARCHAR2(64),
     email   VARCHAR2(64),
-    ownerid NUMBER,
+    ownerid number,
     CONSTRAINT users_fk_ownerid FOREIGN KEY (ownerid) REFERENCES owners (ownerid)
 );
 
@@ -273,4 +273,3 @@ INSERT INTO ships_maintenances (id, ship, maintenance)
 VALUES (3, 900, 3);
 INSERT INTO ships_maintenances (id, ship, maintenance)
 VALUES (4, 902, 4);
-
