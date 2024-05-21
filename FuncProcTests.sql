@@ -8,7 +8,7 @@ create or replace trigger BusinessHoursTriggerShipments
     for each row
 begin
     if sysdate between '23:00' and '05:00' then
-        pkg_crud.push_log('INFO', 'Failed to insert Shipment outside business hours');
+        pkg_crud.log_msg('INFO', 'Failed to insert Shipment outside business hours');
         raise_application_error(-20001, 'not allowed between 5 and 23');
     end if;
 end;
@@ -20,14 +20,14 @@ create or replace trigger BusinessHoursTriggerMaintenances
     for each row
 begin
     if sysdate between '23:00' and '05:00' then
-        pkg_crud.push_log('INFO', 'Failed to insert Maintenance outside business hours');
+        pkg_crud.log_msg('INFO', 'Failed to insert Maintenance outside business hours');
         raise_application_error(-20001, 'not allowed between 5 and 23');
     end if;
 end;
 
 CREATE OR REPLACE Package pkg_crud
 IS
-    PROCEDURE push_log(
+    PROCEDURE log_msg(
         v_severity_param IN VARCHAR2,
         v_description IN VARCHAR2
     );
@@ -115,7 +115,7 @@ CREATE OR REPLACE
 IS
     -- Push Log onto DB
 /* Daniel Kunesch */
-    PROCEDURE push_log(
+    PROCEDURE log_msg(
         v_severity_param IN VARCHAR2,
         v_description_param IN VARCHAR2
     ) IS
@@ -126,7 +126,7 @@ IS
     EXCEPTION
         WHEN OTHERS THEN
             DBMS_OUTPUT.PUT_LINE('Error in push_log: ' || SQLERRM);
-    END push_log;
+    END log_msg;
     -- Add a owner
     /* Jan Haslik */
     FUNCTION add_owner(
@@ -140,15 +140,15 @@ IS
         VALUES (v_ownerid_param, v_name_param, v_contactperson_param, v_contactemail_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on Owners successful');
+        pkg_crud.log_msg('INFO', 'Insert on Owners successful');
         RETURN 'Owner added successfully';
     EXCEPTION
 
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Owners. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on Owners. Reason: Duplicate');
             RETURN 'Owner with the same ID already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Owners. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on Owners. Reason: Unknown');
             RETURN 'Error adding owner';
     END;
 -- Add a user
@@ -164,7 +164,7 @@ IS
         -- Check if the owner exists
         SELECT COUNT(*) INTO owner_count FROM owners WHERE ownerid = v_ownerid_param;
         IF owner_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Users. Reason: Owner not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on Users. Reason: Owner not Found');
             RETURN 'Owner not found';
         END IF;
 
@@ -172,14 +172,14 @@ IS
         VALUES (v_userid_param, v_name_param, v_email_param, v_ownerid_param);
 
         COMMIT;
-        pkg_crud.push_log('Info', 'Insert on Users successful');
+        pkg_crud.log_msg('Info', 'Insert on Users successful');
         RETURN 'User added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Users. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on Users. Reason: Duplicate');
             RETURN 'User with the same ID already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Users. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on Users. Reason: Unknown');
             RETURN 'Error adding user';
     END;
 
@@ -199,7 +199,7 @@ IS
         -- Check if the owner exists
         SELECT COUNT(*) INTO owner_count FROM owners WHERE ownerid = v_owner_param;
         IF owner_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Ships. Reason: Owner not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on Ships. Reason: Owner not Found');
             RETURN 'Owner not found';
         END IF;
 
@@ -208,14 +208,14 @@ IS
                 v_year_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on Ships successful.');
+        pkg_crud.log_msg('INFO', 'Insert on Ships successful.');
         RETURN 'Ship added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Ships. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on Ships. Reason: Duplicate');
             RETURN 'Ship with the same ID already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Ships. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on Ships. Reason: Unknown');
             RETURN 'Error adding ship';
     END;
 
@@ -234,7 +234,7 @@ IS
         -- Check if the owner exists
         SELECT COUNT(*) INTO owner_count FROM owners WHERE ownerid = v_owner_param;
         IF owner_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Planes. Reason: Owner not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on Planes. Reason: Owner not Found');
             RETURN 'Owner not found';
         END IF;
 
@@ -242,14 +242,14 @@ IS
         VALUES (v_planenr_param, v_owner_param, v_type_param, v_image_param, v_currentvalue_param, v_year_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on Owners successful');
+        pkg_crud.log_msg('INFO', 'Insert on Owners successful');
         RETURN 'Plane added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Planes. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on Planes. Reason: Duplicate');
             RETURN 'Plane with the same ID already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Planes. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on Planes. Reason: Unknown');
             RETURN 'Error adding Plane';
     END add_plane;
 
@@ -265,14 +265,14 @@ IS
         VALUES (v_crewmemberid_param, v_name_param, v_role_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on Crewmembers successful');
+        pkg_crud.log_msg('INFO', 'Insert on Crewmembers successful');
         RETURN 'Crewmember added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Crewmembers. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on Crewmembers. Reason: Duplicate');
             RETURN 'Crewmember with the same ID already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on Crewmembers. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on Crewmembers. Reason: Unknown');
             RETURN 'Error adding Crewmember';
     END add_crewmember;
 
@@ -289,13 +289,13 @@ IS
         -- Check if the owner exists
         SELECT COUNT(*) INTO ship_count FROM ships WHERE shipnr = v_ship_param;
         IF ship_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_ships_crewmember. Reason: Ship not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_ships_crewmember. Reason: Ship not Found');
             RETURN 'Ship not found';
         END IF;
 
         SELECT COUNT(*) INTO crewmember_count FROM crewmembers WHERE crewmemberid = v_crewmember_param;
         IF crewmember_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_ships_crewmember. Reason: Crewmember not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_ships_crewmember. Reason: Crewmember not Found');
             RETURN 'Crewmember not found';
         END IF;
 
@@ -303,14 +303,14 @@ IS
         VALUES (v_id_param, v_ship_param, v_crewmember_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on m_n_ships_crewmember successful.');
+        pkg_crud.log_msg('INFO', 'Insert on m_n_ships_crewmember successful.');
         RETURN 'Ships_Crewmember added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_ships_crewmember. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_ships_crewmember. Reason: Duplicate');
             RETURN 'Ships_Crewmember with the same id or combination already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_ships_crewmember. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_ships_crewmember. Reason: Duplicate');
             RETURN 'Error adding Ships_Crewmember';
     END add_ship_crewmember;
 
@@ -327,13 +327,13 @@ IS
         -- Check if the owner exists
         SELECT COUNT(*) INTO plane_count FROM planes WHERE planenr = v_plane_param;
         IF plane_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_planes_crewmember. Reason: Plane not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_planes_crewmember. Reason: Plane not Found');
             RETURN 'Plane not found';
         END IF;
 
         SELECT COUNT(*) INTO crewmember_count FROM crewmembers WHERE crewmemberid = v_crewmember_param;
         IF crewmember_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_planes_crewmember. Reason: Crewmember not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_planes_crewmember. Reason: Crewmember not Found');
             RETURN 'Crewmember not found';
         END IF;
 
@@ -341,14 +341,14 @@ IS
         VALUES (v_id_param, v_plane_param, v_crewmember_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on m_n_planes_crewmember successful.');
+        pkg_crud.log_msg('INFO', 'Insert on m_n_planes_crewmember successful.');
         RETURN 'Ships_Crewmember added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_planes_crewmember. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_planes_crewmember. Reason: Duplicate');
             RETURN 'Ships_Crewmember with the same id or combination already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_planes_crewmember. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_planes_crewmember. Reason: Unknown');
             RETURN 'Error adding Plane_Crewmember';
     END add_plane_crewmember;
 
@@ -367,14 +367,14 @@ IS
                 v_arrivallocation_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on shipment successful.');
+        pkg_crud.log_msg('INFO', 'Insert on shipment successful.');
         RETURN 'Shipment added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on shipment. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on shipment. Reason: Duplicate');
             RETURN 'Shipment with the same ID already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on shipment. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on shipment. Reason: Unknown');
             RETURN 'Error adding Shipment';
     END;
 
@@ -391,13 +391,13 @@ IS
         -- Check if the owner exists
         SELECT COUNT(*) INTO ship_count FROM ships WHERE shipnr = v_ship_param;
         IF ship_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on ships_shipment. Reason: Ship not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on ships_shipment. Reason: Ship not Found');
             RETURN 'Ship not found';
         END IF;
 
         SELECT COUNT(*) INTO shipment_count FROM shipments WHERE shipmentid = v_shipment_param;
         IF shipment_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on ships_shipment. Reason: Shipment not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on ships_shipment. Reason: Shipment not Found');
             RETURN 'Shipment not found';
         END IF;
 
@@ -405,14 +405,14 @@ IS
         VALUES (v_id_param, v_ship_param, v_shipment_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on ships_shipment successful.');
+        pkg_crud.log_msg('INFO', 'Insert on ships_shipment successful.');
         RETURN 'Ships_Shipment added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on ships_shipment. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on ships_shipment. Reason: Duplicate');
             RETURN 'Ships_Shipment with the same id or combination already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on ships_shipment. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on ships_shipment. Reason: Unknown');
             RETURN 'Error adding Ships_Shipment';
     END;
 
@@ -429,13 +429,13 @@ IS
         -- Check if the owner exists
         SELECT COUNT(*) INTO plane_count FROM planes WHERE planenr = v_plane_param;
         IF plane_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on planes_shipment. Reason: Plane not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on planes_shipment. Reason: Plane not Found');
             RETURN 'Plane not found';
         END IF;
 
         SELECT COUNT(*) INTO shipment_count FROM shipments WHERE shipmentid = v_shipment_param;
         IF shipment_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on planes_shipment. Reason: Shipment not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on planes_shipment. Reason: Shipment not Found');
             RETURN 'Shipment not found';
         END IF;
 
@@ -443,14 +443,14 @@ IS
         VALUES (v_id_param, v_plane_param, v_shipment_param);
 
         COMMIT;
-        pkg_crud.push_log('Warning', 'Insert on planes_shipment successful.');
+        pkg_crud.log_msg('Warning', 'Insert on planes_shipment successful.');
         RETURN 'Planes_Shipment added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on planes_shipment. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on planes_shipment. Reason: Duplicate');
             RETURN 'Planes_Shipment with the same id or combination already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on planes_shipment. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on planes_shipment. Reason: Unknown');
             RETURN 'Error adding Planes_Shipment';
     END;
 
@@ -467,14 +467,14 @@ IS
         VALUES (v_maintenanceid_param, v_maintenanceDate_param, v_type_param, v_maintenanceDescription_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on Maintenance successful.');
+        pkg_crud.log_msg('INFO', 'Insert on Maintenance successful.');
         RETURN 'Maintenance added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on maintenances. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on maintenances. Reason: Duplicate');
             RETURN 'Maintenance with the same ID already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on maintenances. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on maintenances. Reason: Unknown');
             RETURN 'Error adding Maintenance';
     END add_maintenance;
 
@@ -491,13 +491,13 @@ IS
         -- Check if the owner exists
         SELECT COUNT(*) INTO ship_count FROM ships WHERE shipnr = v_ship_param;
         IF ship_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_ships_maintenance. Reason: Ship not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_ships_maintenance. Reason: Ship not Found');
             RETURN 'Ship not found';
         END IF;
 
         SELECT COUNT(*) INTO maintenance_count FROM maintenances WHERE maintenanceid = v_maintenance_param;
         IF maintenance_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_ships_maintenances. Reason: Maintenance not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_ships_maintenances. Reason: Maintenance not Found');
             RETURN 'Maintenance not found';
         END IF;
 
@@ -505,14 +505,14 @@ IS
         VALUES (v_id_param, v_ship_param, v_maintenance_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on m_n_ships_maintenance successful.');
+        pkg_crud.log_msg('INFO', 'Insert on m_n_ships_maintenance successful.');
         RETURN 'Ships_Maintenance added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_ships_maintenance. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_ships_maintenance. Reason: Duplicate');
             RETURN 'Ships_Maintenance with the same id or combination already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_ships_maintenance. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_ships_maintenance. Reason: Unknown');
             RETURN 'Error adding Ships_Maintenance';
     END;
 
@@ -529,13 +529,13 @@ IS
         -- Check if the owner exists
         SELECT COUNT(*) INTO plane_count FROM planes WHERE planenr = v_planenr_param;
         IF plane_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_planes_maintenance. Reason: Plane not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_planes_maintenance. Reason: Plane not Found');
             RETURN 'Plane not found';
         END IF;
 
         SELECT COUNT(*) INTO maintenance_count FROM maintenances WHERE maintenanceid = v_maintenanceid_param;
         IF maintenance_count = 0 THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_planes_maintenance. Reason: Maintenance not Found');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_planes_maintenance. Reason: Maintenance not Found');
             RETURN 'Maintenance not found';
         END IF;
 
@@ -543,14 +543,14 @@ IS
         VALUES (v_id_param, v_planenr_param, v_maintenanceid_param);
 
         COMMIT;
-        pkg_crud.push_log('INFO', 'Insert on m_n_planes_maintenance successful.');
+        pkg_crud.log_msg('INFO', 'Insert on m_n_planes_maintenance successful.');
         RETURN 'Planes_Maintenance added successfully';
     EXCEPTION
         WHEN DUP_VAL_ON_INDEX THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_planes_maintenance. Reason: Duplicate');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_planes_maintenance. Reason: Duplicate');
             RETURN 'Planes_Maintenance with the same id or combination already exists';
         WHEN OTHERS THEN
-            pkg_crud.push_log('Warning', 'Failed insert on m_n_planes_maintenance. Reason: Unknown');
+            pkg_crud.log_msg('Warning', 'Failed insert on m_n_planes_maintenance. Reason: Unknown');
             RETURN 'Error adding Planes_Maintenance';
     END;
 
