@@ -1,4 +1,4 @@
-# shipdb
+# shipdb, Ship and Plane Fleet Management Database
 PL/SQL Project 2024
 
 - Jan Haslik
