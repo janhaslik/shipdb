@@ -2,8 +2,9 @@
 -- Assuming you're already connected to the correct schema/user in Oracle.
 
 --DROP TABLE Log;
-/*
+
 -- Drop Tables with Foreign Keys
+/*
 DROP TABLE planes_maintenances;
 DROP TABLE planes_shipments;
 DROP TABLE planes_crewmembers;

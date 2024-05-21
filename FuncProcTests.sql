@@ -27,6 +27,10 @@ end;
 
 CREATE OR REPLACE Package pkg_crud
 IS
+    PROCEDURE push_log(
+        v_severity_param IN VARCHAR2,
+        v_description IN VARCHAR2
+    );
     FUNCTION add_owner(
         v_ownerid_param IN NUMBER,
         v_name_param IN VARCHAR2,
@@ -104,34 +108,25 @@ IS
         v_planenr_param IN NUMBER,
         v_maintenanceid_param IN NUMBER
     ) RETURN VARCHAR2;
-    FUNCTION push_log(
-        v_severity_param in VARCHAR2,
-        v_description in VARCHAR2
-    ) RETURN VARCHAR2;
-
 END pkg_crud;
 --###########################
-create or replace
+CREATE OR REPLACE
     Package Body pkg_crud
 IS
     -- Push Log onto DB
 /* Daniel Kunesch */
-    FUNCTION push_log(
+    PROCEDURE push_log(
         v_severity_param IN VARCHAR2,
         v_description_param IN VARCHAR2
-    ) RETURN VARCHAR2 IS
+    ) IS
     BEGIN
         INSERT INTO Log (severity, description, logDate)
-        VALUES (v_severity_param, v_description_param, sysdate);
-
+        VALUES (v_severity_param, v_description_param, SYSDATE);
         COMMIT;
-
-        RETURN 'Logged successfully';
     EXCEPTION
         WHEN OTHERS THEN
-            RETURN 'Error pushing Log';
+            DBMS_OUTPUT.PUT_LINE('Error in push_log: ' || SQLERRM);
     END push_log;
-
     -- Add a owner
     /* Jan Haslik */
     FUNCTION add_owner(
