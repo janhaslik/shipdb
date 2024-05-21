@@ -1,7 +1,7 @@
 -- Create database (PL/SQL does not directly create databases like MySQL)
 -- Assuming you're already connected to the correct schema/user in Oracle.
 
---DROP TABLE Log;
+--DROP TABLE shipdb_logs;
 
 -- Drop Tables with Foreign Keys
 /*
