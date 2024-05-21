@@ -1,6 +1,6 @@
 -- Business logic
 
--- Trigger to prevent Insertion between 23:00 and 05:00
+-- Trigger to prevent Insertion for Shipments between 23:00 and 05:00
 /* Jan Haslik */
 create or replace trigger BusinessHoursTriggerShipments
     before insert or update or delete
@@ -12,7 +12,7 @@ begin
         raise_application_error(-20001, 'not allowed between 5 and 23');
     end if;
 end;
--- Trigger to prevent Insertion between 23:00 and 05:00
+-- Trigger to prevent Insertion for Maintenances between 23:00 and 05:00
 /* Jan Haslik */
 create or replace trigger BusinessHoursTriggerMaintenances
     before insert or update or delete
@@ -113,7 +113,7 @@ END pkg_crud;
 CREATE OR REPLACE
     Package Body pkg_crud
 IS
-    -- Push Log onto DB
+-- Push Log onto DB
 /* Daniel Kunesch */
     PROCEDURE log_msg(
         v_severity_param IN VARCHAR2,
@@ -151,6 +151,7 @@ IS
             pkg_crud.log_msg('Warning', 'Failed insert on Owners. Reason: Unknown');
             RETURN 'Error adding owner';
     END;
+
 -- Add a user
 /* Jan Haslik */
     FUNCTION add_user(
