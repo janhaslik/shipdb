@@ -1087,6 +1087,21 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
 END pkg_crud_test;
 
 BEGIN
+    /*
+    delete from ships_crewmembers;
+    delete from planes_crewmembers;
+    delete from ships_maintenances;
+    delete from planes_maintenances;
+    delete from ships_shipments;
+    delete from planes_shipments;
+    delete from crewmembers;
+    delete from shipments;
+    delete from maintenances;
+    delete from ships;
+    delete from planes;
+    delete from users;
+    delete from owners;
+    */
     pkg_crud_test.test_add_owner;
     pkg_crud_test.test_add_user;
     pkg_crud_test.test_add_ship;
