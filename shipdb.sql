@@ -163,7 +163,7 @@ CREATE TABLE planes_maintenances
     CONSTRAINT planes_maintenances_unique_planenr_maintenanceid UNIQUE (planenr, maintenanceid)
 );
 -- Create Logging Table
-CREATE TABLE Log
+CREATE TABLE shipdb_logs
 (
     id          NUMBER GENERATED ALWAYS as IDENTITY(START with 1 INCREMENT by 1) PRIMARY KEY,
     severity    VARCHAR2(15),
@@ -273,7 +273,4 @@ INSERT INTO ships_maintenances (id, ship, maintenance)
 VALUES (3, 900, 3);
 INSERT INTO ships_maintenances (id, ship, maintenance)
 VALUES (4, 902, 4);
-
-select *
-from owners;
 

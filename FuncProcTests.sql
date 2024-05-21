@@ -120,7 +120,7 @@ IS
         v_description_param IN VARCHAR2
     ) IS
     BEGIN
-        INSERT INTO Log (severity, description, logDate)
+        INSERT INTO shipdb_logs (severity, description, logDate)
         VALUES (v_severity_param, v_description_param, SYSDATE);
         COMMIT;
     EXCEPTION
