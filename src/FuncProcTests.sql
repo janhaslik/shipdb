@@ -8,7 +8,8 @@ BEGIN
         FOR EACH ROW
         BEGIN
             INSERT INTO shipdb_logs (severity, description, logDate)
-            VALUES (''INFO'', ''INSERT operation on ' || p_table_name || ' table. ' || p_id_column || ': '' || :NEW.' || p_id_column || ', SYSDATE);
+            VALUES (''INFO'', ''INSERT operation on ' || p_table_name || ' table. ' || p_id_column || ': '' || :NEW.' ||
+                      p_id_column || ', SYSDATE);
         END;
     ';
 
@@ -18,7 +19,8 @@ BEGIN
         FOR EACH ROW
         BEGIN
             INSERT INTO shipdb_logs (severity, description, logDate)
-            VALUES (''INFO'', ''UPDATE operation on ' || p_table_name || ' table. ' || p_id_column || ': '' || :NEW.' || p_id_column || ', SYSDATE);
+            VALUES (''INFO'', ''UPDATE operation on ' || p_table_name || ' table. ' || p_id_column || ': '' || :NEW.' ||
+                      p_id_column || ', SYSDATE);
         END;
     ';
 
@@ -28,7 +30,8 @@ BEGIN
         FOR EACH ROW
         BEGIN
             INSERT INTO shipdb_logs (severity, description, logDate)
-            VALUES (''INFO'', ''DELETE operation on ' || p_table_name || ' table. ' || p_id_column || ': '' || :OLD.' || p_id_column || ', SYSDATE);
+            VALUES (''INFO'', ''DELETE operation on ' || p_table_name || ' table. ' || p_id_column || ': '' || :OLD.' ||
+                      p_id_column || ', SYSDATE);
         END;
     ';
 END;
@@ -168,8 +171,6 @@ IS
         INSERT INTO owners (ownerid, name, contactperson, contactemail)
         VALUES (v_ownerid_param, v_name_param, v_contactperson_param, v_contactemail_param);
 
-        COMMIT;
-
         RETURN 'Owner added successfully';
     EXCEPTION
 
@@ -198,7 +199,6 @@ IS
         INSERT INTO users (userid, name, email, ownerid)
         VALUES (v_userid_param, v_name_param, v_email_param, v_ownerid_param);
 
-        COMMIT;
 
         RETURN 'User added successfully';
     EXCEPTION
@@ -232,7 +232,6 @@ IS
         VALUES (v_shipnr_param, v_name_param, v_owner_param, v_type_param, v_image_param, v_currentvalue_param,
                 v_year_param);
 
-        COMMIT;
 
         RETURN 'Ship added successfully';
     EXCEPTION
@@ -264,7 +263,6 @@ IS
         INSERT INTO planes (planenr, owner, type, image, currentvalue, year)
         VALUES (v_planenr_param, v_owner_param, v_type_param, v_image_param, v_currentvalue_param, v_year_param);
 
-        COMMIT;
 
         RETURN 'Plane added successfully';
     EXCEPTION
@@ -285,7 +283,6 @@ IS
         INSERT INTO crewmembers (crewmemberid, name, role)
         VALUES (v_crewmemberid_param, v_name_param, v_role_param);
 
-        COMMIT;
 
         RETURN 'Crewmember added successfully';
     EXCEPTION
@@ -321,7 +318,6 @@ IS
         INSERT INTO ships_crewmembers (id, ship, crewmember)
         VALUES (v_id_param, v_ship_param, v_crewmember_param);
 
-        COMMIT;
 
         RETURN 'Ships_Crewmember added successfully';
     EXCEPTION
@@ -357,7 +353,6 @@ IS
         INSERT INTO ships_crewmembers (id, ship, crewmember)
         VALUES (v_id_param, v_plane_param, v_crewmember_param);
 
-        COMMIT;
 
         RETURN 'Ships_Crewmember added successfully';
     EXCEPTION
@@ -381,7 +376,6 @@ IS
         VALUES (v_shipmentid_param, v_starttime_param, v_endtime_param, v_departurelocation_param,
                 v_arrivallocation_param);
 
-        COMMIT;
 
         RETURN 'Shipment added successfully';
     EXCEPTION
@@ -417,7 +411,6 @@ IS
         INSERT INTO ships_shipments (id, ship, shipment)
         VALUES (v_id_param, v_ship_param, v_shipment_param);
 
-        COMMIT;
 
         RETURN 'Ships_Shipment added successfully';
     EXCEPTION
@@ -453,7 +446,6 @@ IS
         INSERT INTO planes_shipments (id, planenr, shipmentid)
         VALUES (v_id_param, v_plane_param, v_shipment_param);
 
-        COMMIT;
 
         RETURN 'Planes_Shipment added successfully';
     EXCEPTION
@@ -475,7 +467,6 @@ IS
         INSERT INTO maintenances (maintenanceid, maintenancedate, type, maintenancedescription)
         VALUES (v_maintenanceid_param, v_maintenanceDate_param, v_type_param, v_maintenanceDescription_param);
 
-        COMMIT;
 
         RETURN 'Maintenance added successfully';
     EXCEPTION
@@ -511,7 +502,6 @@ IS
         INSERT INTO SHIPS_MAINTENANCES (id, ship, maintenance)
         VALUES (v_id_param, v_ship_param, v_maintenance_param);
 
-        COMMIT;
 
         RETURN 'Ships_Maintenance added successfully';
     EXCEPTION
@@ -547,7 +537,6 @@ IS
         INSERT INTO PLANES_MAINTENANCES (id, planenr, maintenanceid)
         VALUES (v_id_param, v_planenr_param, v_maintenanceid_param);
 
-        COMMIT;
 
         RETURN 'Planes_Maintenance added successfully';
     EXCEPTION
@@ -930,7 +919,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Owner:');
-        v_result := pkg_crud.add_owner(1, 'Test Owner', 'Test Contact', 'contact@test.com');
+        v_result := pkg_crud.add_owner(2, 'Test Owner', 'Test Contact', 'contact@test.com');
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add Owner: Test successful');
     EXCEPTION
@@ -942,7 +931,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add User:');
-        v_result := pkg_crud.add_user(1, 'Test User', 'user@test.com', 1);
+        v_result := pkg_crud.add_user(2, 'Test User', 'user@test.com', 1);
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add User: Test successful');
     EXCEPTION
@@ -954,7 +943,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Ship:');
-        v_result := pkg_crud.add_ship(1, 'Test Ship', 1, 'Cargo', 'image.png', '1000000',
+        v_result := pkg_crud.add_ship(2, 'Test Ship', 2, 'Cargo', 'image.png', '1000000',
                                       TO_DATE('2020-01-01', 'YYYY-MM-DD'));
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add Ship: Test successful');
@@ -967,7 +956,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Plane:');
-        v_result := pkg_crud.add_plane(1, 1, 'Passenger', 'image.png', '2000000', TO_DATE('2019-01-01', 'YYYY-MM-DD'));
+        v_result := pkg_crud.add_plane(2, 2, 'Passenger', 'image.png', '2000000', TO_DATE('2019-01-01', 'YYYY-MM-DD'));
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add User: Test successful');
     EXCEPTION
@@ -979,7 +968,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Crewmember:');
-        v_result := pkg_crud.add_crewmember(1, 'Joe', 'Pilot');
+        v_result := pkg_crud.add_crewmember(2, 'Joe', 'Pilot');
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add Crewmember: Test successful');
     EXCEPTION
@@ -991,7 +980,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Ship:');
-        v_result := pkg_crud.add_ship_crewmember(1, 1, 1);
+        v_result := pkg_crud.add_ship_crewmember(2, 2, 2);
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Ship: Test successful');
     EXCEPTION
@@ -1003,7 +992,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Plane:');
-        v_result := pkg_crud.add_plane_crewmember(1, 1, 1);
+        v_result := pkg_crud.add_plane_crewmember(2, 2, 2);
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add Crewmember to Plane: Test successful');
     EXCEPTION
@@ -1015,7 +1004,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Shipment:');
-        v_result := pkg_crud.add_shipment(1, TO_DATE('2023-01-01 10:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+        v_result := pkg_crud.add_shipment(2, TO_DATE('2023-01-01 10:00:00', 'YYYY-MM-DD HH24:MI:SS'),
                                           TO_DATE('2023-01-01 12:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'New York',
                                           'Los Angeles');
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
@@ -1029,7 +1018,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Ship:');
-        v_result := pkg_crud.add_ship_shipment(1, 1, 1);
+        v_result := pkg_crud.add_ship_shipment(2, 2, 2);
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Ship: Test successful');
     EXCEPTION
@@ -1041,7 +1030,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Plane:');
-        v_result := pkg_crud.add_plane_shipment(1, 1, 1);
+        v_result := pkg_crud.add_plane_shipment(2, 2, 2);
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add Shipment to Plane: Test successful');
     EXCEPTION
@@ -1053,7 +1042,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Maintenance:');
-        v_result := pkg_crud.add_maintenance(1, TO_DATE('2023-02-01', 'YYYY-MM-DD'), 'Engine Check',
+        v_result := pkg_crud.add_maintenance(2, TO_DATE('2023-02-01', 'YYYY-MM-DD'), 'Engine Check',
                                              'Routine engine maintenance');
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add Maintenance: Test successful');
@@ -1066,7 +1055,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Ship:');
-        v_result := pkg_crud.add_ship_maintenance(1, 1, 1);
+        v_result := pkg_crud.add_ship_maintenance(2, 2, 2);
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Ship: Test successful');
     EXCEPTION
@@ -1078,7 +1067,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_crud_test IS
         v_result VARCHAR2(100);
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Plane:');
-        v_result := pkg_crud.add_plane_maintenance(1, 1, 1);
+        v_result := pkg_crud.add_plane_maintenance(2, 2, 2);
         DBMS_OUTPUT.PUT_LINE('Result -> ' || v_result);
         DBMS_OUTPUT.PUT_LINE('Test Add Maintenance to Plane: Test successful');
     EXCEPTION
@@ -1102,8 +1091,8 @@ BEGIN
     delete from ships;
     delete from planes;
     delete from users;
-    delete from owners;
-    */
+    delete from owners;*/
+
     pkg_crud_test.test_add_owner;
     pkg_crud_test.test_add_user;
     pkg_crud_test.test_add_ship;
