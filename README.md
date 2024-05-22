@@ -18,9 +18,9 @@ Deadline: 21.5.2023
   + [x] Präsentation
 
 ## Beurteilung: 
-  + [ ] Use-Cases (20% - 40%, nach Komplexität) (Schwiergikeit der Abfragen, Control Statements, Cursor, …)
-  + [ ] Layers (10%)
-  + [ ] Logging (10%)
-  + [ ] Tests (20%)
-  + [ ] Dokumentation (10%)
-  + [ ] Präsentation (10%)
+  + [x] Use-Cases (20% - 40%, nach Komplexität) (Schwiergikeit der Abfragen, Control Statements, Cursor, …)
+  + [x] Layers (10%)
+  + [x] Logging (10%)
+  + [x] Tests (20%)
+  + [x] Dokumentation (10%)
+  + [x] Präsentation (10%)
